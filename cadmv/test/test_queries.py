@@ -2,7 +2,7 @@
 import copy
 import unittest
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import cadmv.models as models
