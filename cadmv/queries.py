@@ -142,3 +142,13 @@ def create_wait_time(session, wait_time):
     wt = WaitTime(**wait_time)
     with session_scope(session) as sessn:
         sessn.add(wt)
+
+
+def get_wait_time_by_number(session, branch_num):
+    """Gets the wait times for a particular DMV branch
+
+    :param session:     SQLAlchemy session
+    :param branch_num:  (int) branch number
+    :return:            (list) of all wait times for the desired branch
+    """
+    pass
