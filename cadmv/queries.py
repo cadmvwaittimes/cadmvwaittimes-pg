@@ -7,8 +7,8 @@ from sqlalchemy import update
 # from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
 
-from models import Branch, WaitTime
-from session import session_scope
+from cadmv.models import Branch, WaitTime
+from cadmv.session import session_scope
 
 
 # Session = sessionmaker(bind=config.engine)
