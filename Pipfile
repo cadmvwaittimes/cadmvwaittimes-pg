@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+pylint = "*"
+autopep8 = "*"
+pytest = "*"
+
+[packages]
+requests = "==2.19.1"
+SQLAlchemy = "==1.2.14"
+
+[requires]
+python_version = "3.6"
