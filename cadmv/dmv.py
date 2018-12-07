@@ -9,7 +9,7 @@ offices_json_url = base_url + '/foims_offices_min.json'
 wait_times_url = base_url + '/output3.txt'
 
 
-def get_offices_json(timeout=1):
+def get_offices_json(url=offices_json_url, timeout=1):
     """
     Makes a request to the offices_json_url URL and retrieves the CA DMV
     offices. timeout is set to 1 second because it seems like the DMV's site
@@ -19,14 +19,14 @@ def get_offices_json(timeout=1):
     but not limited to, name, address, hours, branch number, etc. See
     offices.py for an example of the response is returned.
     """
-    resp = requests.get(offices_json_url, timeout=timeout)
+    resp = requests.get(url, timeout=timeout)
     if not resp.ok:
         raise requests.exceptions.HTTPError
 
     return resp.json()['foims_offices']['offices']
 
 
-def get_wait_times(timeout=1):
+def get_wait_times(url=wait_times_url, timeout=1):
     """
     Makes a request to the wait_times_url URL and retrieves the wait times
     for each CA DMV office. timeout is to 1 second because it seems like the
@@ -51,7 +51,7 @@ def get_wait_times(timeout=1):
     ]
     """
     now = datetime.datetime.utcnow()
-    resp = requests.get(wait_times_url, timeout=timeout)
+    resp = requests.get(url, timeout=timeout)
     if not resp.ok:
         raise requests.exceptions.HTTPError
 
