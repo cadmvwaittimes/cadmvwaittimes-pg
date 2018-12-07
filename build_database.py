@@ -10,7 +10,7 @@ import pathlib
 from sqlalchemy import MetaData
 
 import config
-import models
+import cadmv.models as models
 
 
 is_db_new = not os.path.exists(config.db_filename)
