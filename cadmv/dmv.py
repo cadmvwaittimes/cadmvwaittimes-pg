@@ -3,8 +3,6 @@ import datetime
 
 import requests
 
-# import offices
-
 
 base_url = 'https://www.dmv.ca.gov/wasapp/webdata'
 offices_json_url = base_url + '/foims_offices_min.json'
@@ -15,7 +13,7 @@ def get_offices_json(timeout=1):
     """
     Makes a request to the offices_json_url URL and retrieves the CA DMV
     offices. timeout is set to 1 second because it seems like the DMV's site
-    is slow.
+    is slow to respond.
 
     Returns a list of dicts of offices with a lot of information including,
     but not limited to, name, address, hours, branch number, etc. See

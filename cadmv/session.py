@@ -1,5 +1,9 @@
 """Module to manage database sessions"""
 from contextlib import contextmanager
+import logging
+
+
+logger = logging.getLogger('dictionaryapi.session')
 
 
 @contextmanager
@@ -10,7 +14,6 @@ def session_scope(session):
 
     https://docs.sqlalchemy.org/en/latest/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
     """
-    session = Session()
     try:
         yield session
         session.commit()

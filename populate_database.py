@@ -14,8 +14,8 @@ def prep_data():
         "region": "3",
         "hours": "0800-1700,0800-1700,0900-1700,0800-1700,0800-1700,n,n"
         "address": "3344 B Lake Tahoe Boulevard, South Lake Tahoe, CA 96150",
-        "latitude": "38.945748",
-        "longitude": "-119.969890",
+        "latitude": 38.945748,
+        "longitude": -119.969890,
         "nearby1": 0,
         "nearby2": 0,
         "nearby3": 0,
