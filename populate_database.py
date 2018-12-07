@@ -1,6 +1,11 @@
 """Populates the database with the branches data"""
+import sys
+
+from sqlalchemy.orm import sessionmaker
+
+import config
 import offices
-import queries
+import cadmv.queries as queries
 
 
 def prep_data():
@@ -48,13 +53,23 @@ def prep_data():
     return cleaned
 
 
-def populate_database(data=None):
-    """Populates the database with all of the offices. If no data is passed,
-    then data is pulled (and cleaned) from the offices module. Otherwise, the
-    passed in data is used.
+def populate_branches_table(sessn, data=None):
+    """Populates the branches table with all of the branches. If no data is
+    passed, then data is pulled (and cleaned) from the offices module.
+    Otherwise, the passed in data is used.
     """
     if data is None:
         data = prep_data()
 
     for datum in data:
-        queries.create_new_branch(datum)
+        queries.create_new_branch(sessn, datum)
+
+
+if __name__ == '__main__':
+    Session = sessionmaker(bind=config.engine)
+    session = Session()
+
+    if len(sys.argv) < 2:
+        populate_branches_table(session)
+    else:
+        populate_branches_table(session, sys.argv[1])
