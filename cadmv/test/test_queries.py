@@ -142,6 +142,38 @@ class UpdateBranchQueriesTest(unittest.TestCase):
         self.assertEqual(branch.address, new_address)
 
 
+class IsBranchInDatabaseQueriesTest(unittest.TestCase):
+    """Tests the is_branch_in_database function"""
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        # Create a branch and add it to the DB
+        b = BRANCHES[0]
+        branch = models.Branch(**b)
+        self.session.add(branch)
+        self.session.commit()
+
+    def tearDown(self):
+        """Close the connection to the database after each test"""
+        self.session.close()
+
+    def test_is_branch_in_database_true(self):
+        """Test that a branch that is in the database returns True"""
+        branch_num = BRANCHES[0]['number']
+        is_in_db = queries.is_branch_in_database(self.session, branch_num)
+        self.assertTrue(is_in_db)
+
+    def test_is_branch_in_database_false(self):
+        """Test that a branch that is in the database returns True"""
+        branch_num = 999999999
+        is_in_db = queries.is_branch_in_database(self.session, branch_num)
+        self.assertFalse(is_in_db)
+
+
 class CreateWaitTimeQueriesTest(unittest.TestCase):
     """Tests the CREATE WaitTime queries"""
     def setUp(self):
