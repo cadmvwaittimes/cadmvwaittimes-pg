@@ -259,22 +259,24 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
+        # Create a wait time and add it to the DB
+        w1 = WAIT_TIMES[0]
+        w2 = WAIT_TIMES[1]
+        wait_times = [models.WaitTime(**w1), models.WaitTime(**w2)]
+        self.session.add_all(wait_times)
+        self.session.commit()
+
     def tearDown(self):
         """Close the session after the test is run"""
         self.session.close()
 
-    def test_get_wait_time_by_number_success(self):
+    def test_get_wait_time_by_date_success(self):
         """Test that a new DMV branch is created"""
-        # Create a wait time and add it to the DB
-        w = WAIT_TIMES[0]
-        wait_time = models.WaitTime(**w)
-        self.session.add(wait_time)
-        self.session.commit()
+        date = datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
 
-        wt = queries.get_wait_time_by_number(
-            self.session, WAIT_TIMES[0]['branch_id'])
+        wt = queries.get_wait_time_by_date(self.session, date)
 
-        self.assertIsInstance(wt, models.WaitTime)
+        self.assertEqual(len(wt), 2)
 
     def test_get_wait_time_by_number_fail(self):
         """Test that a new DMV branch is created"""
