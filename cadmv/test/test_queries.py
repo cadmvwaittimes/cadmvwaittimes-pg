@@ -1,5 +1,6 @@
 """Tests for the queries module"""
 import copy
+import datetime
 import unittest
 
 from sqlalchemy import create_engine
@@ -38,6 +39,21 @@ BRANCHES = [
         'nearby5': 544,
         'number': 537,
         'region': 1
+    }
+]
+
+WAIT_TIMES = [
+    {
+        'branch_id': 542,
+        'appt': 15,
+        'non_appt': 27,
+        'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+    },
+    {
+        'branch_id': 537,
+        'appt': 26,
+        'non_appt': 47,
+        'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
     }
 ]
 
@@ -174,7 +190,7 @@ class IsBranchInDatabaseQueriesTest(unittest.TestCase):
         self.assertFalse(is_in_db)
 
 
-class CreateWaitTimeQueriesTest(unittest.TestCase):
+class CreateWaitNewTimeQueriesTest(unittest.TestCase):
     """Tests the CREATE WaitTime queries"""
     def setUp(self):
         """Setup an in-memory SQLite database"""
@@ -183,15 +199,48 @@ class CreateWaitTimeQueriesTest(unittest.TestCase):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def test_create_new_branch(self):
-        """Test that a new DMV branch is created"""
-        branch = BRANCHES[0]
-        queries.create_new_branch(self.session, branch)
-        b = self.session.query(models.Branch).\
-            filter_by(number=branch['number']).first()
+    def test_create_new_wait_time(self):
+        """Test that a new wait time is created for a DMV branch"""
+        wait_time = WAIT_TIMES[0]
+        queries.create_wait_time(self.session, wait_time)
+        wt = self.session.query(models.WaitTime).\
+            filter_by(branch_id=wait_time['branch_id']).first()
         self.session.close()
 
-        self.assertIsInstance(b, models.Branch)
+        self.assertIsInstance(wt, models.WaitTime)
+
+
+class GetWaitTimeQueriesTest(unittest.TestCase):
+    """Tests the GET WaitTime queries by branch number"""
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def tearDown(self):
+        """Close the session after the test is run"""
+        self.session.close()
+
+    def test_get_wait_time_by_number_success(self):
+        """Test that a new DMV branch is created"""
+        # Create a wait time and add it to the DB
+        w = WAIT_TIMES[0]
+        wait_time = models.WaitTime(**w)
+        self.session.add(wait_time)
+        self.session.commit()
+
+        wt = queries.get_wait_time_by_number(
+            self.session, WAIT_TIMES[0]['branch_id'])
+
+        self.assertIsInstance(wt, models.WaitTime)
+
+    def test_get_wait_time_by_number_fail(self):
+        """Test that a new DMV branch is created"""
+        wt = queries.get_wait_time_by_number(self.session, 99999999)
+
+        self.assertIsNone(wt, models.WaitTime)
 
 
 if __name__ == '__main__':

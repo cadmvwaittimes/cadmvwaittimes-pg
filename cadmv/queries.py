@@ -149,6 +149,17 @@ def get_wait_time_by_number(session, branch_num):
 
     :param session:     SQLAlchemy session
     :param branch_num:  (int) branch number
-    :return:            (list) of all wait times for the desired branch
+    :return:            (list) of all wait times for the desired branch if
+                        there are any in the database. Otherwise, returns
+                        None
     """
-    pass
+    wait_times = None
+    try:
+        wait_times = session.query(WaitTime).\
+            filter_by(branch_id=branch_num).first()
+    except:
+        logger.error('An error occurred accessing the database', exc_info=True)
+    finally:
+        session.close()
+
+    return wait_times
