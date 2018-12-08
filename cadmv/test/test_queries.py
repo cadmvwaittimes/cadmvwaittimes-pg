@@ -271,7 +271,7 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         self.session.close()
 
     def test_get_wait_time_by_date_success(self):
-        """Test that a new DMV branch is created"""
+        """Test that wait times are recieved for a given date"""
         date = datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
 
         wt = queries.get_wait_time_by_date(self.session, date)
@@ -279,12 +279,12 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         self.assertEqual(len(wt), 2)
 
     def test_get_wait_time_by_date_fail(self):
-        """Test that a new DMV branch is created"""
+        """Test that wait times are not recieved for a given, incorrect date"""
         date = datetime.datetime(2010, 12, 6, 23, 22, 13, 859932)
 
         wt = queries.get_wait_time_by_date(self.session, date)
 
-        self.assertEqual(len(wt), 0)
+        self.assertIsNone(wt)
 
 
 if __name__ == '__main__':
