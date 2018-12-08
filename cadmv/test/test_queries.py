@@ -284,7 +284,7 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
 
         wt = queries.get_wait_time_by_date(self.session, date)
 
-        self.assertIsNone(wt)
+        self.assertEqual(len(wt), 0)
 
 
 if __name__ == '__main__':
