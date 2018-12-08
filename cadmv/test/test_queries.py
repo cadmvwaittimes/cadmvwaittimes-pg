@@ -210,7 +210,7 @@ class CreateWaitNewTimeQueriesTest(unittest.TestCase):
         self.assertIsInstance(wt, models.WaitTime)
 
 
-class GetWaitTimeQueriesTest(unittest.TestCase):
+class GetWaitTimeByNumberQueriesTest(unittest.TestCase):
     """Tests the GET WaitTime queries by branch number"""
     def setUp(self):
         """Setup an in-memory SQLite database"""
