@@ -278,11 +278,13 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
 
         self.assertEqual(len(wt), 2)
 
-    def test_get_wait_time_by_number_fail(self):
+    def test_get_wait_time_by_date_fail(self):
         """Test that a new DMV branch is created"""
-        wt = queries.get_wait_time_by_number(self.session, 99999999)
+        date = datetime.datetime(2010, 12, 6, 23, 22, 13, 859932)
 
-        self.assertIsNone(wt, models.WaitTime)
+        wt = queries.get_wait_time_by_date(self.session, date)
+
+        self.assertEqual(len(wt), 0)
 
 
 if __name__ == '__main__':
