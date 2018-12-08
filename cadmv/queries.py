@@ -163,3 +163,24 @@ def get_wait_time_by_number(session, branch_num):
         session.close()
 
     return wait_times
+
+
+def get_wait_time_by_date(session, date):
+    """Gets the wait times for a particular DMV branch
+
+    :param session: SQLAlchemy session
+    :param date:    (datetime) date
+    :return:        (list) of all wait times for the desired date if there
+                    are any in the database. Otherwise, returns an empty
+                    list
+    """
+    wait_times = None
+    try:
+        wait_times = session.query(WaitTime).\
+            filter_by(timestamp=date).all()
+    except:
+        logger.error('An error occurred accessing the database', exc_info=True)
+    finally:
+        session.close()
+
+    return wait_times
