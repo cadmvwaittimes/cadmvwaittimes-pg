@@ -204,7 +204,29 @@ class CreateWaitNewTimeQueriesTest(unittest.TestCase):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def test_create_new_wait_time(self):
+    def tearDown(self):
+        """Close the connection to the database after each test"""
+        self.session.close()
+
+    def test_create_new_wait_times(self):
+        """Test that new wait time entries are created"""
+        queries.create_wait_times(self.session, WAIT_TIMES)
+        wt = self.session.query(models.WaitTime).filter_by().all()
+
+        self.assertEqual(len(wt), 2)
+
+
+class CreateWaitNewTimesQueriesTest(unittest.TestCase):
+    """Tests the CREATE WaitTime en masse queries"""
+
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def test_create_new_wait_times(self):
         """Test that a new wait time is created for a DMV branch"""
         wait_time = WAIT_TIMES[0]
         queries.create_wait_time(self.session, wait_time)
@@ -283,6 +305,46 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         date = datetime.datetime(2010, 12, 6, 23, 22, 13, 859932)
 
         wt = queries.get_wait_time_by_date(self.session, date)
+
+        self.assertEqual(len(wt), 0)
+
+
+class GetWaitTimesByRegionQueriesTest(unittest.TestCase):
+    """Tests the GET WaitTimes queries by region"""
+
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        # Create entries for branches in the database
+        branches = [models.Branch(**b) for b in BRANCHES]
+        self.session.add_all(branches)
+
+    def tearDown(self):
+        """Close the session after the test is run"""
+        self.session.close()
+
+    def test_get_wait_times_by_region_success(self):
+        """Test that wait times are retrieved for a certain region"""
+        # Create a wait time and add it to the DB
+        w = WAIT_TIMES[0]
+        wait_time = models.WaitTime(**w)
+        self.session.add(wait_time)
+        self.session.commit()
+
+        wt = queries.get_wait_times_by_region(
+            self.session, BRANCHES[0]['region'])
+
+        self.assertEqual(len(wt), 1)
+
+    def test_get_wait_times_by_region_fail(self):
+        """Test that a wait times are not retrieved for a non-existant
+        region
+        """
+        wt = queries.get_wait_times_by_region(self.session, 99999999)
 
         self.assertEqual(len(wt), 0)
 
