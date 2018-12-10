@@ -216,7 +216,6 @@ class CreateWaitNewTimeQueriesTest(unittest.TestCase):
         self.assertEqual(len(wt), 2)
 
 
-<<<<<<< HEAD
 class CreateWaitNewTimesQueriesTest(unittest.TestCase):
     """Tests the CREATE WaitTime en masse queries"""
 
@@ -236,8 +235,6 @@ class CreateWaitNewTimesQueriesTest(unittest.TestCase):
         self.assertEqual(len(wts), 2)
 
 
-=======
->>>>>>> master
 class GetWaitTimeByNumberQueriesTest(unittest.TestCase):
     """Tests the GET WaitTime queries by branch number"""
 
