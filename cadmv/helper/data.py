@@ -45,3 +45,51 @@ def prep_branches_data():
         cleaned.append(clean_office)
 
     return cleaned
+
+
+def prep_wait_times_data(data, timestamp):
+    """Prepares the wait times data taken from the CA DMV's website to be
+    entered into the database. The wait times request comes in as
+
+    [
+        568,0,10,
+        ...
+        538,0,23
+    ]
+
+    where the entries in a row correspond to branch number, appointments wait
+    time (in minutes), and non-appoints wait time (in minutes), respectively.
+    The data is transformed to be of the form
+
+    [
+        {
+            'branch_id': 568,
+            'appt': 0,
+            'non_appt': 10,
+            'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+        },
+        ...
+        {
+            'branch_id': 538,
+            'appt': 0,
+            'non_appt': 23,
+            'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+        }
+    ]
+
+    Note that the timestamps all have the same time because they are all sourced
+    at the same time.
+    """
+    wait_times = []
+
+    for wt in data:
+        wt = wt.split(',')
+        wait_time = {
+            'branch_id': int(wt[0]),
+            'appt': int(wt[1]),
+            'non_appt': int(wt[2]),
+            'timestamp': timestamp
+        }
+        wait_times.append(wait_time)
+
+    return wait_times
