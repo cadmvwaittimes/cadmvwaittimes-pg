@@ -19,7 +19,6 @@ def main():
 
     Session = sessionmaker(bind=config.engine)
     session = Session()
-    # NOTE: The below function does'n currently exist, but it will...
     queries.create_wait_times(session, wait_times)
 
 
