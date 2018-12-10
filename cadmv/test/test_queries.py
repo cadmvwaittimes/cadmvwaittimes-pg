@@ -227,14 +227,12 @@ class CreateWaitNewTimesQueriesTest(unittest.TestCase):
         self.session = Session()
 
     def test_create_new_wait_times(self):
-        """Test that a new wait time is created for a DMV branch"""
-        wait_time = WAIT_TIMES[0]
-        queries.create_wait_time(self.session, wait_time)
-        wt = self.session.query(models.WaitTime).\
-            filter_by(branch_id=wait_time['branch_id']).first()
+        """Test that new wait times are created for a DMV branch"""
+        queries.create_wait_times(self.session, WAIT_TIMES)
+        wts = self.session.query(models.WaitTime).all()
         self.session.close()
 
-        self.assertIsInstance(wt, models.WaitTime)
+        self.assertEqual(len(wts), 2)
 
 
 class GetWaitTimeByNumberQueriesTest(unittest.TestCase):
