@@ -1,11 +1,10 @@
 """Module that holds the database queries"""
-from contextlib import contextmanager
 import datetime
 import logging
 
-from sqlalchemy import update
-# from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
+from sqlalchemy.sql.expression import func
+from sqlalchemy import func
 
 from cadmv.models import Branch, WaitTime
 from cadmv.session import session_scope
@@ -193,7 +192,9 @@ def get_wait_time_by_number(session, branch_num):
 
 
 def get_wait_time_by_date(session, date):
-    """Gets the wait times for a particular DMV branch
+    """Gets the wait times for a particular DMV branch by the date. Searches
+    between the morning (midnight) and evening (just before midnight) in UTC
+    time
 
     :param session: SQLAlchemy session
     :param date:    (datetime) date
@@ -202,9 +203,13 @@ def get_wait_time_by_date(session, date):
                     list
     """
     wait_times = None
+    year, month, day = date.date().year, date.date().month, date.date().day
     try:
-        wait_times = session.query(WaitTime).\
-            filter_by(timestamp=date).all()
+        wait_times = session.query(WaitTime)\
+            .filter(func.extract('year', WaitTime.timestamp) == year)\
+            .filter(func.extract('month', WaitTime.timestamp) == month)\
+            .filter(func.extract('day', WaitTime.timestamp) == day)\
+            .all()
     except:
         logger.error('An error occurred accessing the database', exc_info=True)
     finally:
