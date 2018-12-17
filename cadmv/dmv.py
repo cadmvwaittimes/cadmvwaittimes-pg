@@ -72,7 +72,7 @@ def get_wait_times(url=None, timeout=1):
     if url is None:
         url = wait_times_url
 
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now()
     resp = requests.get(url, timeout=timeout)
     if not resp.ok:
         raise requests.exceptions.HTTPError
