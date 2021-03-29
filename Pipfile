@@ -10,7 +10,7 @@ autopep8 = "*"
 pytest = "*"
 
 [packages]
-requests = "==2.19.1"
+requests = "==2.20.0"
 SQLAlchemy = "==1.2.14"
 
 [requires]
