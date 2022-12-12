@@ -1,11 +1,10 @@
 """Module that holds the database queries"""
-from contextlib import contextmanager
 import datetime
 import logging
 
-from sqlalchemy import update
-# from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
+from sqlalchemy.sql.expression import func
+from sqlalchemy import func
 
 from cadmv.models import Branch, WaitTime
 from cadmv.session import session_scope
@@ -144,6 +143,33 @@ def create_wait_time(session, wait_time):
         sessn.add(wt)
 
 
+def create_wait_times(session, wait_times):
+    """Creates new wait time entries in the database en masse
+
+    :param session:     SQLAlchemy session
+    :param wait_times:  (list) of a wait times of the form
+    [
+        {
+            'branch_id': 542,
+            'appt': 15,
+            'non_appt': 27,
+            'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+        },
+        ...
+        {
+            'branch_id': 537,
+            'appt': 26,
+            'non_appt': 47,
+            'timestamp': datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+        }
+    ]
+    """
+    wts = [WaitTime(**wt) for wt in wait_times]
+
+    with session_scope(session) as sessn:
+        sessn.add_all(wts)
+
+
 def get_wait_time_by_number(session, branch_num):
     """Gets the wait times for a particular DMV branch
 
@@ -157,6 +183,58 @@ def get_wait_time_by_number(session, branch_num):
     try:
         wait_times = session.query(WaitTime).\
             filter_by(branch_id=branch_num).first()
+    except:
+        logger.error('An error occurred accessing the database', exc_info=True)
+    finally:
+        session.close()
+
+    return wait_times
+
+
+def get_wait_time_by_date(session, date):
+    """Gets the wait times for a particular DMV branch by the date. Searches
+    between the morning (midnight) and evening (just before midnight) in UTC
+    time
+
+    :param session: SQLAlchemy session
+    :param date:    (datetime) date
+    :return:        (list) of all wait times for the desired date if there
+                    are any in the database. Otherwise, returns an empty
+                    list
+    """
+    wait_times = None
+    year, month, day = date.date().year, date.date().month, date.date().day
+    try:
+        wait_times = session.query(WaitTime)\
+            .filter(func.extract('year', WaitTime.timestamp) == year)\
+            .filter(func.extract('month', WaitTime.timestamp) == month)\
+            .filter(func.extract('day', WaitTime.timestamp) == day)\
+            .all()
+    except:
+        logger.error('An error occurred accessing the database', exc_info=True)
+    finally:
+        session.close()
+
+    return wait_times
+
+
+def get_wait_times_by_region(session, region):
+    """Gets the wait times for a particular DMV branch
+
+    :param session:     SQLAlchemy session
+    :param branch_num:  (int) branch number
+    :return:            (list) of all wait times and associated branches for
+                        the desired region if there are any in the database.
+                        Otherwise, returns an empty list
+    """
+    # NOTE: this is returning a tuple of pairs of wait times and branches which
+    # is NOT what I want. I want to return only a list of wait times. So, this
+    # is a work in progress
+    wait_times = None
+    try:
+        query = session.query(WaitTime, Branch)
+        wait_times = query.filter(Branch.region==region)\
+                          .filter(Branch.number==WaitTime.branch_id).all()
     except:
         logger.error('An error occurred accessing the database', exc_info=True)
     finally:
