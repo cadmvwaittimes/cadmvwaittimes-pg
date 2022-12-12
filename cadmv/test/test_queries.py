@@ -60,6 +60,7 @@ WAIT_TIMES = [
 
 class GetBranchQueriesTest(unittest.TestCase):
     """Tests the GET Branch queries"""
+
     def setUp(self):
         """Setup an in-memory SQLite database"""
         self.engine = create_engine('sqlite://')
@@ -112,6 +113,7 @@ class GetBranchQueriesTest(unittest.TestCase):
 
 class CreateBranchQueriesTest(unittest.TestCase):
     """Tests the CREATE Branch queries"""
+
     def setUp(self):
         """Setup an in-memory SQLite database"""
         self.engine = create_engine('sqlite://')
@@ -132,6 +134,7 @@ class CreateBranchQueriesTest(unittest.TestCase):
 
 class UpdateBranchQueriesTest(unittest.TestCase):
     """Tests the UPDATE Branch queries"""
+
     def setUp(self):
         """Setup an in-memory SQLite database and create a branch"""
         self.engine = create_engine('sqlite://')
@@ -160,6 +163,7 @@ class UpdateBranchQueriesTest(unittest.TestCase):
 
 class IsBranchInDatabaseQueriesTest(unittest.TestCase):
     """Tests the is_branch_in_database function"""
+
     def setUp(self):
         """Setup an in-memory SQLite database"""
         self.engine = create_engine('sqlite://')
@@ -192,6 +196,7 @@ class IsBranchInDatabaseQueriesTest(unittest.TestCase):
 
 class CreateWaitNewTimeQueriesTest(unittest.TestCase):
     """Tests the CREATE WaitTime queries"""
+
     def setUp(self):
         """Setup an in-memory SQLite database"""
         self.engine = create_engine('sqlite://')
@@ -199,19 +204,40 @@ class CreateWaitNewTimeQueriesTest(unittest.TestCase):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def test_create_new_wait_time(self):
-        """Test that a new wait time is created for a DMV branch"""
-        wait_time = WAIT_TIMES[0]
-        queries.create_wait_time(self.session, wait_time)
-        wt = self.session.query(models.WaitTime).\
-            filter_by(branch_id=wait_time['branch_id']).first()
+    def tearDown(self):
+        """Close the connection to the database after each test"""
         self.session.close()
 
-        self.assertIsInstance(wt, models.WaitTime)
+    def test_create_new_wait_times(self):
+        """Test that new wait time entries are created"""
+        queries.create_wait_times(self.session, WAIT_TIMES)
+        wt = self.session.query(models.WaitTime).filter_by().all()
+
+        self.assertEqual(len(wt), 2)
+
+
+class CreateWaitNewTimesQueriesTest(unittest.TestCase):
+    """Tests the CREATE WaitTime en masse queries"""
+
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def test_create_new_wait_times(self):
+        """Test that new wait times are created for a DMV branch"""
+        queries.create_wait_times(self.session, WAIT_TIMES)
+        wts = self.session.query(models.WaitTime).all()
+        self.session.close()
+
+        self.assertEqual(len(wts), 2)
 
 
 class GetWaitTimeByNumberQueriesTest(unittest.TestCase):
     """Tests the GET WaitTime queries by branch number"""
+
     def setUp(self):
         """Setup an in-memory SQLite database"""
         self.engine = create_engine('sqlite://')
@@ -241,6 +267,84 @@ class GetWaitTimeByNumberQueriesTest(unittest.TestCase):
         wt = queries.get_wait_time_by_number(self.session, 99999999)
 
         self.assertIsNone(wt, models.WaitTime)
+
+
+class GetWaitTimeByDateQueriesTest(unittest.TestCase):
+    """Tests the GET WaitTime queries by date"""
+
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        # Create a wait time and add it to the DB
+        w1 = WAIT_TIMES[0]
+        w2 = WAIT_TIMES[1]
+        wait_times = [models.WaitTime(**w1), models.WaitTime(**w2)]
+        self.session.add_all(wait_times)
+        self.session.commit()
+
+    def tearDown(self):
+        """Close the session after the test is run"""
+        self.session.close()
+
+    def test_get_wait_time_by_date_success(self):
+        """Test that wait times are recieved for a given date"""
+        date = datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
+
+        wt = queries.get_wait_time_by_date(self.session, date)
+
+        self.assertEqual(len(wt), 2)
+
+    def test_get_wait_time_by_date_fail(self):
+        """Test that wait times are not recieved for a given, incorrect date"""
+        date = datetime.datetime(2010, 12, 6, 23, 22, 13, 859932)
+
+        wt = queries.get_wait_time_by_date(self.session, date)
+
+        self.assertEqual(len(wt), 0)
+
+
+class GetWaitTimesByRegionQueriesTest(unittest.TestCase):
+    """Tests the GET WaitTimes queries by region"""
+
+    def setUp(self):
+        """Setup an in-memory SQLite database"""
+        self.engine = create_engine('sqlite://')
+        models.Base.metadata.create_all(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        # Create entries for branches in the database
+        branches = [models.Branch(**b) for b in BRANCHES]
+        self.session.add_all(branches)
+
+    def tearDown(self):
+        """Close the session after the test is run"""
+        self.session.close()
+
+    def test_get_wait_times_by_region_success(self):
+        """Test that wait times are retrieved for a certain region"""
+        # Create a wait time and add it to the DB
+        w = WAIT_TIMES[0]
+        wait_time = models.WaitTime(**w)
+        self.session.add(wait_time)
+        self.session.commit()
+
+        wt = queries.get_wait_times_by_region(
+            self.session, BRANCHES[0]['region'])
+
+        self.assertEqual(len(wt), 1)
+
+    def test_get_wait_times_by_region_fail(self):
+        """Test that a wait times are not retrieved for a non-existant
+        region
+        """
+        wt = queries.get_wait_times_by_region(self.session, 99999999)
+
+        self.assertEqual(len(wt), 0)
 
 
 if __name__ == '__main__':

@@ -10,7 +10,11 @@ import cadmv.queries as queries
 import config
 
 
+<<<<<<< HEAD
 logger = logging.getLogger("cadmv.scraper")
+=======
+logger = logging.getLogger('dictionaryapi.session')
+>>>>>>> 37a90c60cfe69cdeddc75e72d8376f51aed172c9
 
 
 def main():
@@ -22,5 +26,9 @@ def main():
     queries.create_wait_times(session, wait_times)
 
 
+<<<<<<< HEAD
 if __name__ == "__main__":
+=======
+if __name__ == '__main__':
+>>>>>>> 37a90c60cfe69cdeddc75e72d8376f51aed172c9
     main()
