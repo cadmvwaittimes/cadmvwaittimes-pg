@@ -10,8 +10,10 @@ autopep8 = "*"
 pytest = "*"
 
 [packages]
-requests = "==2.20.0"
-SQLAlchemy = "==1.3.0"
+defusedxml = "*"
+requests = "*"
+SQLAlchemy = "*"
+pipfile = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.10"
