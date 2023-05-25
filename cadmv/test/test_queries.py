@@ -149,7 +149,7 @@ class UpdateBranchQueriesTest(unittest.TestCase):
         self.session.commit()
 
     def test_update_new_branch(self):
-        """Test that DMV branch is upated"""
+        """Test that DMV branch is updated"""
         new_address = '123 Fake St., Springfield, OH 45503'
         b = copy.deepcopy(BRANCHES[0])
         b['address'] = new_address
@@ -291,7 +291,7 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         self.session.close()
 
     def test_get_wait_time_by_date_success(self):
-        """Test that wait times are recieved for a given date"""
+        """Test that wait times are received for a given date"""
         date = datetime.datetime(2018, 12, 6, 23, 22, 13, 859932)
 
         wt = queries.get_wait_time_by_date(self.session, date)
@@ -299,7 +299,7 @@ class GetWaitTimeByDateQueriesTest(unittest.TestCase):
         self.assertEqual(len(wt), 2)
 
     def test_get_wait_time_by_date_fail(self):
-        """Test that wait times are not recieved for a given, incorrect date"""
+        """Test that wait times are not received for a given, incorrect date"""
         date = datetime.datetime(2010, 12, 6, 23, 22, 13, 859932)
 
         wt = queries.get_wait_time_by_date(self.session, date)
@@ -339,7 +339,7 @@ class GetWaitTimesByRegionQueriesTest(unittest.TestCase):
         self.assertEqual(len(wt), 1)
 
     def test_get_wait_times_by_region_fail(self):
-        """Test that a wait times are not retrieved for a non-existant
+        """Test that a wait times are not retrieved for a non-existent
         region
         """
         wt = queries.get_wait_times_by_region(self.session, 99999999)
