@@ -22,6 +22,5 @@ def main():
     queries.create_wait_times(session, wait_times)
 
 
-
 if __name__ == "__main__":
     main()

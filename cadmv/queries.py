@@ -2,9 +2,10 @@
 import datetime
 import logging
 
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.expression import func
-from sqlalchemy import func
 
 from cadmv.models import Branch, WaitTime
 from cadmv.session import session_scope
@@ -12,10 +13,10 @@ from cadmv.session import session_scope
 
 # Session = sessionmaker(bind=config.engine)
 
-logger = logging.getLogger('dictionaryapi.queries')
+logger = logging.getLogger("dictionaryapi.queries")
 
 
-def create_new_branch(session, branch_info):
+def create_new_branch(session: Session, branch_info: dict) -> None:
     """Creates a new DMV branch in the database.
 
     :param session:     SQLAlchemy session
@@ -40,7 +41,7 @@ def create_new_branch(session, branch_info):
         sessn.add(branch)
 
 
-def update_branch(session, branch_info):
+def update_branch(session: Session, branch_info: dict) -> None:
     """Updates DMV branch in the database
 
     :param session:     SQLAlchemy session
@@ -63,13 +64,12 @@ def update_branch(session, branch_info):
     NOTE: this could potentially be slow for a large number of entries.
     However, there's less than 200 CA DMVs so should be ok.
     """
-    number = branch_info['number']
+    number = branch_info["number"]
     with session_scope(session) as sessn:
-        sessn.query(Branch).filter_by(number=number).\
-            update(branch_info)
+        sessn.query(Branch).filter_by(number=number).update(branch_info)
 
 
-def get_branch_by_number(session, number):
+def get_branch_by_number(session: Session, number: int):
     """Gets a branch by its number
 
     :param session:     SQLAlchemy session
@@ -81,7 +81,7 @@ def get_branch_by_number(session, number):
     try:
         branch = session.query(Branch).filter_by(number=number).first()
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 
@@ -101,7 +101,7 @@ def get_branches_by_region(session, region):
     try:
         branches = session.query(Branch).filter_by(region=region).all()
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 
@@ -116,10 +116,9 @@ def is_branch_in_database(session, branch_num):
     """
     does_exist = False
     try:
-        does_exist = session.query(exists().where(
-            Branch.number == branch_num)).scalar()
+        does_exist = session.query(exists().where(Branch.number == branch_num)).scalar()
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 
@@ -181,10 +180,9 @@ def get_wait_time_by_number(session, branch_num):
     """
     wait_times = None
     try:
-        wait_times = session.query(WaitTime).\
-            filter_by(branch_id=branch_num).first()
+        wait_times = session.query(WaitTime).filter_by(branch_id=branch_num).first()
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 
@@ -205,13 +203,15 @@ def get_wait_time_by_date(session, date):
     wait_times = None
     year, month, day = date.date().year, date.date().month, date.date().day
     try:
-        wait_times = session.query(WaitTime)\
-            .filter(func.extract('year', WaitTime.timestamp) == year)\
-            .filter(func.extract('month', WaitTime.timestamp) == month)\
-            .filter(func.extract('day', WaitTime.timestamp) == day)\
+        wait_times = (
+            session.query(WaitTime)
+            .filter(func.extract("year", WaitTime.timestamp) == year)
+            .filter(func.extract("month", WaitTime.timestamp) == month)
+            .filter(func.extract("day", WaitTime.timestamp) == day)
             .all()
+        )
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 
@@ -233,10 +233,13 @@ def get_wait_times_by_region(session, region):
     wait_times = None
     try:
         query = session.query(WaitTime, Branch)
-        wait_times = query.filter(Branch.region==region)\
-                          .filter(Branch.number==WaitTime.branch_id).all()
+        wait_times = (
+            query.filter(Branch.region == region)
+            .filter(Branch.number == WaitTime.branch_id)
+            .all()
+        )
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
     finally:
         session.close()
 

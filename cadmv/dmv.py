@@ -6,9 +6,9 @@ import requests
 from cadmv.helper import data
 
 
-base_url = 'https://www.dmv.ca.gov/wasapp/webdata'
-offices_json_url = base_url + '/foims_offices_min.json'
-wait_times_url = base_url + '/output3.txt'
+base_url = "https://www.dmv.ca.gov/wasapp/webdata"
+offices_json_url = base_url + "/foims_offices_min.json"
+wait_times_url = base_url + "/output3.txt"
 
 
 def get_offices_json(url: str = None, timeout: float = 1.0) -> list[dict]:
@@ -40,7 +40,7 @@ def get_offices_json(url: str = None, timeout: float = 1.0) -> list[dict]:
     if not resp.ok:
         raise requests.exceptions.HTTPError()
 
-    return resp.json()['foims_offices']['offices']
+    return resp.json()["foims_offices"]["offices"]
 
 
 def get_wait_times(url: str = None, timeout: float = 1.0) -> list[dict]:
@@ -94,8 +94,8 @@ def get_wait_times(url: str = None, timeout: float = 1.0) -> list[dict]:
     if not resp.ok:
         raise requests.exceptions.HTTPError
 
-    text = resp.text.split('\r\n')[1:]
-    del text[0] # remove the header
+    text = resp.text.split("\r\n")[1:]
+    del text[0]  # remove the header
 
     wait_times = data.prep_wait_times_data(text, now)
     return wait_times

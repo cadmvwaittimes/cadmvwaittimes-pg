@@ -20,7 +20,7 @@ def populate_branches_table(sessn, data=None):
         queries.create_new_branch(sessn, datum)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Session = sessionmaker(bind=config.engine)
     session = Session()
 

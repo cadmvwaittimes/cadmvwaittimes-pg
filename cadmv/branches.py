@@ -34,7 +34,7 @@ def read_one(number):
         # Serialize the data for the response
         branch_schema = BranchSchema()
         return branch_schema.dump(branch).data
-    
+
     # Otherwise, nope, didn't find the branch
     else:
         # abort(404, f'Branch not found for number: {number}')

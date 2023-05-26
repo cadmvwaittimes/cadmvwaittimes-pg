@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import logging
 
 
-logger = logging.getLogger('dictionaryapi.session')
+logger = logging.getLogger("dictionaryapi.session")
 
 
 @contextmanager
@@ -18,7 +18,7 @@ def session_scope(session):
         yield session
         session.commit()
     except:
-        logger.error('An error occurred accessing the database', exc_info=True)
+        logger.error("An error occurred accessing the database", exc_info=True)
         session.rollback()
         raise
     finally:

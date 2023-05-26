@@ -20,8 +20,10 @@ if not is_db_new:
     logging.info('The database file "%s" exists.', config.db_filename)
 else:
     pathlib.Path(config.db_filename).touch()
-    logging.info('The database file "%s" did not exist '
-                 'and has been created.', config.db_filename)
+    logging.info(
+        'The database file "%s" did not exist ' "and has been created.",
+        config.db_filename,
+    )
 
 models.Base.metadata.create_all(bind=config.engine)
 metadata = MetaData(config.engine, reflect=False)
