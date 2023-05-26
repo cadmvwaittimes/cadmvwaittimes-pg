@@ -8,12 +8,13 @@ ipython = "*"
 pylint = "*"
 autopep8 = "*"
 pytest = "*"
+coverage = "*"
 
 [packages]
 defusedxml = "*"
 requests = "*"
-SQLAlchemy = "*"
 pipfile = "*"
+sqlalchemy = "*"
 
 [requires]
 python_version = "3.11"
